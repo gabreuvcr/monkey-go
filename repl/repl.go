@@ -17,7 +17,7 @@ func Start(in io.Reader, out io.Writer) {
 		fmt.Fprint(out, PROMPT)
 		scanned := scanner.Scan()
 		if !scanned {
-			return 
+			return
 		}
 
 		line := scanner.Text()
