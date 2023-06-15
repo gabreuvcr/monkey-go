@@ -26,72 +26,72 @@ func (l *Lexer) NextToken() token.Token {
 			ch := l.ch
 			l.readChar()
 			var literal = string(ch) + string(l.ch)
-			tok = createTokenLiteral(token.Equal, literal)
+			tok = createToken(token.Equal, literal)
 		} else {
-			tok = createToken(token.Assign, l.ch)
+			tok = createToken(token.Assign, string(l.ch))
 		}
 	case '+':
-		tok = createToken(token.Plus, l.ch)
+		tok = createToken(token.Plus, string(l.ch))
 	case '-':
-		tok = createToken(token.Minus, l.ch)
+		tok = createToken(token.Minus, string(l.ch))
 	case '!':
 		if l.peekChar() == '=' {
 			ch := l.ch
 			l.readChar()
 			var literal = string(ch) + string(l.ch)
-			tok = createTokenLiteral(token.NotEqual, literal)
+			tok = createToken(token.NotEqual, literal)
 		} else {
-			tok = createToken(token.Bang, l.ch)
+			tok = createToken(token.Bang, string(l.ch))
 		}
 	case '/':
-		tok = createToken(token.Slash, l.ch)
+		tok = createToken(token.Slash, string(l.ch))
 	case '*':
-		tok = createToken(token.Asterisk, l.ch)
+		tok = createToken(token.Asterisk, string(l.ch))
 	case '<':
-		tok = createToken(token.LessThan, l.ch)
+		tok = createToken(token.LessThan, string(l.ch))
 	case '>':
-		tok = createToken(token.GreatThan, l.ch)
+		tok = createToken(token.GreatThan, string(l.ch))
 	case ';':
-		tok = createToken(token.Semicolon, l.ch)
+		tok = createToken(token.Semicolon, string(l.ch))
 	case '(':
-		tok = createToken(token.LeftParen, l.ch)
+		tok = createToken(token.LeftParen, string(l.ch))
 	case ')':
-		tok = createToken(token.RightParen, l.ch)
+		tok = createToken(token.RightParen, string(l.ch))
 	case ',':
-		tok = createToken(token.Comma, l.ch)
+		tok = createToken(token.Comma, string(l.ch))
 	case '{':
-		tok = createToken(token.LeftBrace, l.ch)
+		tok = createToken(token.LeftBrace, string(l.ch))
 	case '}':
-		tok = createToken(token.RightBrace, l.ch)
+		tok = createToken(token.RightBrace, string(l.ch))
 	case 0:
-		tok = createTokenLiteral(token.Eof, "")
+		tok = createToken(token.Eof, "")
 	default:
 		if isLetter(l.ch) {
 			var literal = l.readIdentifier()
 			switch literal {
 			case "fn":
-				tok = createTokenLiteral(token.Function, literal)
+				tok = createToken(token.Function, literal)
 			case "let":
-				tok = createTokenLiteral(token.Let, literal)
+				tok = createToken(token.Let, literal)
 			case "true":
-				tok = createTokenLiteral(token.True, literal)
+				tok = createToken(token.True, literal)
 			case "false":
-				tok = createTokenLiteral(token.False, literal)
+				tok = createToken(token.False, literal)
 			case "if":
-				tok = createTokenLiteral(token.If, literal)
+				tok = createToken(token.If, literal)
 			case "else":
-				tok = createTokenLiteral(token.Else, literal)
+				tok = createToken(token.Else, literal)
 			case "return":
-				tok = createTokenLiteral(token.Return, literal)
+				tok = createToken(token.Return, literal)
 			default:
-				tok = createTokenLiteral(token.Ident, literal)
+				tok = createToken(token.Ident, literal)
 			}
 			return tok
 		} else if isDigit(l.ch) {
 			var literal = l.readInt()
-			return createTokenLiteral(token.Int, literal)
+			return createToken(token.Int, literal)
 		} else {
-			tok = createToken(token.Illegal, l.ch)
+			tok = createToken(token.Illegal, string(l.ch))
 		}
 	}
 
@@ -99,11 +99,7 @@ func (l *Lexer) NextToken() token.Token {
 	return tok
 }
 
-func createToken(tokenType token.TokenType, ch byte) token.Token {
-	return token.Token{Type: tokenType, Literal: string(ch)}
-}
-
-func createTokenLiteral(tokenType token.TokenType, ch string) token.Token {
+func createToken(tokenType token.TokenType, ch string) token.Token {
 	return token.Token{Type: tokenType, Literal: ch}
 }
 
