@@ -21,6 +21,10 @@ func (l *Lexer) NextToken() token.Token {
 	l.skipWhitespace()
 
 	switch l.ch {
+	case '+':
+		tok = createToken(token.Plus, string(l.ch))
+	case '-':
+		tok = createToken(token.Minus, string(l.ch))
 	case '=':
 		if l.peekChar() == '=' {
 			ch := l.ch
@@ -30,10 +34,6 @@ func (l *Lexer) NextToken() token.Token {
 		} else {
 			tok = createToken(token.Assign, string(l.ch))
 		}
-	case '+':
-		tok = createToken(token.Plus, string(l.ch))
-	case '-':
-		tok = createToken(token.Minus, string(l.ch))
 	case '!':
 		if l.peekChar() == '=' {
 			ch := l.ch
@@ -68,22 +68,9 @@ func (l *Lexer) NextToken() token.Token {
 	default:
 		if isLetter(l.ch) {
 			var literal = l.readIdentifier()
-			switch literal {
-			case "fn":
-				tok = createToken(token.Function, literal)
-			case "let":
-				tok = createToken(token.Let, literal)
-			case "true":
-				tok = createToken(token.True, literal)
-			case "false":
-				tok = createToken(token.False, literal)
-			case "if":
-				tok = createToken(token.If, literal)
-			case "else":
-				tok = createToken(token.Else, literal)
-			case "return":
-				tok = createToken(token.Return, literal)
-			default:
+			if keywordToken, ok := token.GetKeyword(literal); ok {
+				tok = createToken(keywordToken, literal)
+			} else {
 				tok = createToken(token.Ident, literal)
 			}
 			return tok

@@ -37,3 +37,18 @@ const (
 	Else       TokenType = "Else"
 	Return     TokenType = "Return"
 )
+
+var keywords = map[string]TokenType{
+	"fn":     Function,
+	"let":    Let,
+	"true":   True,
+	"false":  False,
+	"if":     If,
+	"else":   Else,
+	"return": Return,
+}
+
+func GetKeyword(ident string) (TokenType, bool) {
+	tok, ok := keywords[ident]
+	return tok, ok
+}
