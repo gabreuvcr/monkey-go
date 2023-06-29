@@ -27,9 +27,7 @@ func TestLetStataments(t *testing.T) {
 			len(program.Statements))
 	}
 
-	tests := []struct {
-		expectedIdentifier string
-	} {
+	tests := []struct{ expectedIdentifier string }{
 		{"x"},
 		{"y"},
 		{"foobar"},
