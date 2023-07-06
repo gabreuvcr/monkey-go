@@ -1,11 +1,11 @@
 package token
 
+type TokenType string
+
 type Token struct {
 	Type    TokenType
 	Literal string
 }
-
-type TokenType string
 
 const (
 	Illegal    TokenType = "Illegal"
@@ -48,7 +48,11 @@ var keywords = map[string]TokenType{
 	"return": Return,
 }
 
-func GetKeyword(ident string) (TokenType, bool) {
+func New(tokenType TokenType, literal string) Token {
+	return Token{Type: tokenType, Literal: literal}
+}
+
+func Keyword(ident string) (TokenType, bool) {
 	tok, ok := keywords[ident]
 	return tok, ok
 }

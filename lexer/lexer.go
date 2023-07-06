@@ -4,8 +4,8 @@ import "monkey/token"
 
 type Lexer struct {
 	input        string
-	position     int
-	readPosition int
+	currPosition int
+	nextPosition int
 	ch           byte
 }
 
@@ -22,63 +22,59 @@ func (l *Lexer) NextToken() token.Token {
 
 	switch l.ch {
 	case '+':
-		tok = createToken(token.Plus, string(l.ch))
+		tok = token.New(token.Plus, "+")
 	case '-':
-		tok = createToken(token.Minus, string(l.ch))
+		tok = token.New(token.Minus, "-")
 	case '=':
 		if l.peekChar() == '=' {
-			ch := l.ch
 			l.readChar()
-			var literal = string(ch) + string(l.ch)
-			tok = createToken(token.Equal, literal)
+			tok = token.New(token.Equal, "==")
 		} else {
-			tok = createToken(token.Assign, string(l.ch))
+			tok = token.New(token.Assign, "=")
 		}
 	case '!':
 		if l.peekChar() == '=' {
-			ch := l.ch
 			l.readChar()
-			var literal = string(ch) + string(l.ch)
-			tok = createToken(token.NotEqual, literal)
+			tok = token.New(token.NotEqual, "!=")
 		} else {
-			tok = createToken(token.Bang, string(l.ch))
+			tok = token.New(token.Bang, "!")
 		}
 	case '/':
-		tok = createToken(token.Slash, string(l.ch))
+		tok = token.New(token.Slash, "/")
 	case '*':
-		tok = createToken(token.Asterisk, string(l.ch))
+		tok = token.New(token.Asterisk, "*")
 	case '<':
-		tok = createToken(token.LessThan, string(l.ch))
+		tok = token.New(token.LessThan, "<")
 	case '>':
-		tok = createToken(token.GreatThan, string(l.ch))
+		tok = token.New(token.GreatThan, ">")
 	case ';':
-		tok = createToken(token.Semicolon, string(l.ch))
+		tok = token.New(token.Semicolon, ";")
 	case '(':
-		tok = createToken(token.LeftParen, string(l.ch))
+		tok = token.New(token.LeftParen, "(")
 	case ')':
-		tok = createToken(token.RightParen, string(l.ch))
+		tok = token.New(token.RightParen, ")")
 	case ',':
-		tok = createToken(token.Comma, string(l.ch))
+		tok = token.New(token.Comma, ",")
 	case '{':
-		tok = createToken(token.LeftBrace, string(l.ch))
+		tok = token.New(token.LeftBrace, "{")
 	case '}':
-		tok = createToken(token.RightBrace, string(l.ch))
+		tok = token.New(token.RightBrace, "}")
 	case 0:
-		tok = createToken(token.Eof, "")
+		tok = token.New(token.Eof, "")
 	default:
 		if isLetter(l.ch) {
 			var literal = l.readIdentifier()
-			if keywordToken, ok := token.GetKeyword(literal); ok {
-				tok = createToken(keywordToken, literal)
+			if keywordToken, ok := token.Keyword(literal); ok {
+				tok = token.New(keywordToken, literal)
 			} else {
-				tok = createToken(token.Ident, literal)
+				tok = token.New(token.Ident, literal)
 			}
 			return tok
 		} else if isDigit(l.ch) {
 			var literal = l.readInt()
-			return createToken(token.Int, literal)
+			return token.New(token.Int, literal)
 		} else {
-			tok = createToken(token.Illegal, string(l.ch))
+			tok = token.New(token.Illegal, string(l.ch))
 		}
 	}
 
@@ -86,25 +82,21 @@ func (l *Lexer) NextToken() token.Token {
 	return tok
 }
 
-func createToken(tokenType token.TokenType, ch string) token.Token {
-	return token.Token{Type: tokenType, Literal: ch}
-}
-
 func (l *Lexer) readChar() {
-	if l.readPosition >= len(l.input) {
+	if l.nextPosition >= len(l.input) {
 		l.ch = 0
 	} else {
-		l.ch = l.input[l.readPosition]
+		l.ch = l.input[l.nextPosition]
 	}
-	l.position = l.readPosition
-	l.readPosition += 1
+	l.currPosition = l.nextPosition
+	l.nextPosition += 1
 }
 
 func (l *Lexer) peekChar() byte {
-	if l.readPosition >= len(l.input) {
+	if l.nextPosition >= len(l.input) {
 		return 0
 	}
-	return l.input[l.readPosition]
+	return l.input[l.nextPosition]
 }
 
 func isLetter(ch byte) bool {
@@ -116,19 +108,19 @@ func isDigit(ch byte) bool {
 }
 
 func (l *Lexer) readIdentifier() string {
-	position := l.position
+	currPosition := l.currPosition
 	for isLetter(l.ch) {
 		l.readChar()
 	}
-	return l.input[position:l.position]
+	return l.input[currPosition:l.currPosition]
 }
 
 func (l *Lexer) readInt() string {
-	position := l.position
+	currPosition := l.currPosition
 	for isDigit(l.ch) {
 		l.readChar()
 	}
-	return l.input[position:l.position]
+	return l.input[currPosition:l.currPosition]
 }
 
 func (l *Lexer) skipWhitespace() {
